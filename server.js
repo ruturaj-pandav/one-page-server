@@ -29,7 +29,7 @@ var upload = multer({
   storage: storage,
 });
 
-mongoose.connect("mongodb://localhost:27017/onepage", (err) => {
+mongoose.connect("mongodb+srv://ruturajpandav:ruturaj123@cluster0.kpohdlz.mongodb.net/onepage?retryWrites=true&w=majority", (err) => {
   if (err) {
     console.error("ERROR");
     console.error(err);
@@ -520,3 +520,4 @@ app.get("/all-feedback", async function (req, res) {
 app.listen(process.env.PORT || 8000, () => {
   console.log("listening 8000");
 });
+ 

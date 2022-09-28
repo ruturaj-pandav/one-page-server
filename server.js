@@ -353,12 +353,12 @@ app.post("/create-fact", upload.single("file"), async function (req, res) {
   }
 });
 
-app.post("test-post-request" , async (req, res) => {
+app.post("/test-post-request" , async (req, res) => {
   res.json({
     message : "random test post received"
   })
 })
-app.get("test-get-request" , async (req, res) => {
+app.get("/test-get-request" , async (req, res) => {
   res.json({
     message : "random test get received"
   })

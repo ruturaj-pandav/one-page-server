@@ -354,7 +354,7 @@ app.post("/create-fact", upload.single("file"), async function (req, res) {
 });
 
 app.post("/test-post-request" , async (req, res) => {
-  let data = req.body; 
+  let data = req.body.name; 
   res.json({
     message : "random test post received", 
     data : data 

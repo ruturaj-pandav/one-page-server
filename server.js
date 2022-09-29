@@ -4,6 +4,7 @@ const cors = require("cors");
 const app = express();
 const sha1 = require("sha1");
 const User = require("./schema/user");
+const bodyParser  = require("body-parser");
 const Fact = require("./schema/fact");
 const Quote = require("./schema/quote");
 const Feedback = require("./schema/feedback");
@@ -15,7 +16,8 @@ const path = require("path");
 app.use(express.json());
 
 app.use(cors());
-
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 var storage = multer.diskStorage({
   destination: (req, file, callBack) => {
     callBack(null, "./uploads/"); // './public/images/' directory name where save the file

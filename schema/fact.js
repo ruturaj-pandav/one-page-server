@@ -4,15 +4,20 @@ const FactSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   description: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   img: {
-    type:String , required: true,
+    type: String,
+    required: true,
+  },
+  imgkey: {
+    type: String,
+    required: true,
   },
 
   tags: [

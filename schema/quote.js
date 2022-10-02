@@ -16,6 +16,10 @@ const quoteSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  imgkey: {
+    type: String,
+    required: true,
+  },
 
   date: {
     type: Date,

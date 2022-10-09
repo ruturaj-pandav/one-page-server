@@ -7,12 +7,14 @@ const User = require("./schema/user");
 const bodyParser = require("body-parser");
 const Fact = require("./schema/fact");
 const Quote = require("./schema/quote");
+const TDTY = require("./schema/thisDayThatYear");
 const Feedback = require("./schema/feedback");
 const AWS = require("aws-sdk");
 const fs = require("fs");
 const multer = require("multer");
 // require("dotenv").config();
 const path = require("path");
+const { CodeStarNotifications } = require("aws-sdk");
 app.use(express.json());
 
 app.use(cors());
@@ -216,6 +218,66 @@ app.post("/create-quote", upload.single("file"), async function (req, res) {
   }
 });
 
+app.post("/create-tdty", upload.single("file"), async function (req, res) {
+  console.log("trying to create tdty");
+  if (!req.file) {
+    console.log("No file upload");
+  } else {
+    console.log("tdty 1");
+    var file = req.file;
+    let filepath = req.file.path;
+
+    const blob = fs.readFileSync(filepath);
+
+    console.log("upload 2");
+    const params = {
+      // Bucket: "onepage-users",
+      Bucket: "onepage-tdty",
+      Key: file.originalname,
+      Body: blob,
+    };
+    console.log("tdty 3");
+
+    s3.upload(params, async function (err, data) {
+      if (err) {
+        throw err;
+      } else {
+        console.log("tdty 4 ");
+        let location = data.Location;
+
+        let thistdty = {
+          topic:req.body.topic,
+          description: req.body.description,
+          dateOfEvent: req.body.date,
+          img: location,
+          imgkey: file.originalname,
+        };
+
+        let tdty = await TDTY.create(thistdty);
+
+        console.log("tdty 5");
+        if (tdty) {
+          console.log("tdty 6");
+          console.log(file.originalname);
+          fs.unlink(`uploads/${file.originalname}`, function (err) {
+            if (err) {
+              console.log("error ", err.message);
+            } else {
+              console.log("file deleted");
+            }
+          });
+          console.log("upload 7");
+          res.json({
+            msg: "created",
+            tdtyCreated: true,
+            tdty,
+          });
+        }
+      }
+    });
+  }
+});
+
 app.post("/create-fact", upload.single("file"), async function (req, res) {
   console.log("trying to create fact");
   if (!req.file) {
@@ -400,6 +462,40 @@ app.delete("/delete-feedback/:id", async function (req, res) {
     }
   }
 });
+app.delete("/delete-tdty/:id", async function (req, res) {
+  console.log("deletetdty1");
+  let id = req.params.id;
+
+  console.log("this is id to delete ", id);
+  if (id !== undefined && id !== "" && id !== null) {
+    let tdty = await TDTY.findByIdAndDelete(id);
+    if (tdty) {
+      console.log("tdty foud");
+
+      var params = {
+        Bucket: "onepage-tdty",
+        Key: tdty.imgkey,
+      };
+
+      s3.deleteObject(params, function (err, data) {
+        if (err) {
+          console.log(err);
+          callback(err);
+        } else {
+          console.log("no error in aws as well ");
+          res.json({
+            msg: "delted",
+            tdty_deleted: true,
+          });
+        }
+      });
+    } else {
+      res.json({
+        msg: "failed to delted",
+      });
+    }
+  }
+});
 app.delete("/delete-quote/:id", async function (req, res) {
   let id = req.params.id;
 
@@ -466,6 +562,15 @@ app.get("/all-feedback", async function (req, res) {
   res.json({
     feedbacks: feedback.length,
     feedback,
+  });
+});
+app.get("/all-tdty", async function (req, res) {
+  console.log("trying to get all tdty");
+  let tdty = await TDTY.find();
+
+  res.json({
+    tdtyl: tdty.length,
+    tdty,
   });
 });
 
